@@ -36,8 +36,8 @@ public class UserService {
             List<User> users = response.getBody();
             
             // Return the third element (index 2)
-            if (users != null && users.size() > 2) {
-                User thirdUser = users.get(4);
+            if (users != null) {
+                User thirdUser = users.get(2);
                 logger.info("Successfully retrieved third user: {}", thirdUser);
                 return thirdUser;
             } else {
