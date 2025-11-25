@@ -1,10 +1,12 @@
 package com.example.projectb.controller;
 
+import com.example.projectb.exception.InsufficientUsersException;
 import com.example.projectb.model.User;
 import com.example.projectb.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,9 @@ public class UserController {
             User thirdUser = userService.getThirdUser();
             logger.info("Successfully returning third user: {}", thirdUser);
             return ResponseEntity.ok(thirdUser);
+        } catch (InsufficientUsersException e) {
+            logger.error("Error occurred while getting third user: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (RuntimeException e) {
             logger.error("Error occurred while getting third user: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();

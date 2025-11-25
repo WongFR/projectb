@@ -1,5 +1,6 @@
 package com.example.projectb.service;
 
+import com.example.projectb.exception.InsufficientUsersException;
 import com.example.projectb.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,16 +36,23 @@ public class UserService {
             
             List<User> users = response.getBody();
             
-            // Return the third element (index 2)
-            if (users != null) {
-                User thirdUser = users.get(2);
-                logger.info("Successfully retrieved third user: {}", thirdUser);
-                return thirdUser;
-            } else {
-                String errorMsg = "User list does not contain a third element. List size: " + (users != null ? users.size() : 0);
+            // Check if we have enough users before accessing index 2
+            if (users == null) {
+                String errorMsg = "Received null user list from projecta API";
                 logger.error(errorMsg);
-                throw new RuntimeException(errorMsg);
+                throw new InsufficientUsersException(errorMsg);
             }
+            
+            if (users.size() < 3) {
+                String errorMsg = String.format("Insufficient users to return third user. Expected at least 3, but got %d users", users.size());
+                logger.error(errorMsg);
+                throw new InsufficientUsersException(errorMsg);
+            }
+            
+            // Safe to access index 2 now
+            User thirdUser = users.get(2);
+            logger.info("Successfully retrieved third user: {}", thirdUser);
+            return thirdUser;
         } catch (RuntimeException e) {
             logger.error("Failed to get third user from projecta API: {}", e.getMessage(), e);
             throw e;
