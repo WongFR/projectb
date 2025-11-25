@@ -35,16 +35,22 @@ public class UserService {
             
             List<User> users = response.getBody();
             
-            // Return the third element (index 2)
-            if (users != null) {
-                User thirdUser = users.get(2);
-                logger.info("Successfully retrieved third user: {}", thirdUser);
-                return thirdUser;
-            } else {
-                String errorMsg = "User list does not contain a third element. List size: " + (users != null ? users.size() : 0);
+            // Return the third element (index 2) with bounds validation
+            if (users == null) {
+                String errorMsg = "Received null user list from projecta API";
                 logger.error(errorMsg);
-                throw new RuntimeException(errorMsg);
+                throw new IllegalStateException(errorMsg);
             }
+            
+            if (users.size() < 3) {
+                String errorMsg = String.format("Insufficient users to retrieve third user. Expected at least 3 users, but got %d", users.size());
+                logger.error(errorMsg);
+                throw new IllegalArgumentException(errorMsg);
+            }
+            
+            User thirdUser = users.get(2);
+            logger.info("Successfully retrieved third user: {}", thirdUser);
+            return thirdUser;
         } catch (RuntimeException e) {
             logger.error("Failed to get third user from projecta API: {}", e.getMessage(), e);
             throw e;
